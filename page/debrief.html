@@ -1,0 +1,833 @@
+<title>Handler's Debrief</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --paper: #e6e8e4;
+    --card: #f2f3f0;
+    --ink: #1b211f;
+    --dim: #5c6360;
+    --rule: #c7ccc6;
+    --stamp: #a32b21;
+    --green: #0b6b3a;
+    --amber: #8a6410;
+    --shadow: 0 1px 0 rgb(27 33 31 / 6%);
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+    --sans: "IBM Plex Sans", "Helvetica Neue", system-ui, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #121617;
+      --card: #1b2022;
+      --ink: #dee3e0;
+      --dim: #8e9793;
+      --rule: #2c3335;
+      --stamp: #d9564a;
+      --green: #3e9c6b;
+      --amber: #c99a34;
+      --shadow: none;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #121617;
+    --card: #1b2022;
+    --ink: #dee3e0;
+    --dim: #8e9793;
+    --rule: #2c3335;
+    --stamp: #d9564a;
+    --green: #3e9c6b;
+    --amber: #c99a34;
+    --shadow: none;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  * { box-sizing: border-box; }
+
+  .wrap { max-width: 44rem; margin: 0 auto; padding: 0 16px 6rem; }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .top {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .top-in {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 0.7rem 16px 0.55rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.9rem;
+    align-items: baseline;
+  }
+
+  .mark {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--stamp);
+  }
+
+  .op {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .when { font-family: var(--mono); font-size: 0.72rem; color: var(--dim); }
+
+  .meter { height: 3px; background: var(--rule); }
+  .meter > i { display: block; height: 100%; background: var(--green); width: 0; transition: width 0.25s ease; }
+  @media (prefers-reduced-motion: reduce) { .meter > i { transition: none; } }
+
+  .tabs { display: flex; gap: 0; max-width: 44rem; margin: 0 auto; padding: 0 16px; }
+
+  .tabs button {
+    flex: 1 1 0;
+    appearance: none;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    padding: 0.55rem 0.2rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+    cursor: pointer;
+  }
+
+  .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--stamp); }
+  .tabs button:focus-visible { outline: 2px solid var(--green); outline-offset: -2px; }
+
+  /* ---------------------------------------------------------------- questions */
+
+  .q {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+    margin-top: 0.9rem;
+  }
+
+  .q-no {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    color: var(--dim);
+  }
+
+  .q-ask {
+    font-size: 1.08rem;
+    font-weight: 500;
+    line-height: 1.4;
+    text-wrap: balance;
+    margin: 0.15rem 0 0.6rem;
+  }
+
+  .chip {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    line-height: 1.5;
+    color: var(--dim);
+    border-left: 2px solid var(--rule);
+    padding: 0.1rem 0 0.1rem 0.6rem;
+    margin-bottom: 0.7rem;
+    overflow-wrap: anywhere;
+  }
+
+  .q textarea {
+    width: 100%;
+    min-height: 5.5rem;
+    resize: vertical;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    border-radius: 0;
+    padding: 0.6rem 0.65rem;
+    font-family: var(--sans);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .q textarea:focus-visible { outline: 2px solid var(--green); outline-offset: -1px; }
+
+  .q-foot {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+    min-height: 1.9rem;
+  }
+
+  .state {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    flex: 1 1 auto;
+  }
+
+  .state[data-on="saved"] { color: var(--green); }
+  .state[data-on="held"] { color: var(--amber); }
+
+  .skip {
+    appearance: none;
+    background: none;
+    border: 1px solid var(--rule);
+    color: var(--dim);
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.7rem;
+    min-height: 2.1rem;
+    cursor: pointer;
+  }
+
+  .q[data-skip="1"] { opacity: 0.62; }
+  .q[data-skip="1"] .skip { border-color: var(--stamp); color: var(--stamp); }
+
+  /* ---------------------------------------------------------------- log */
+
+  .tally { display: flex; flex-wrap: wrap; gap: 1.1rem 1.6rem; padding: 1rem 0 0.4rem; }
+  .tally div { display: flex; flex-direction: column; line-height: 1.15; }
+  .tally b { font-family: var(--mono); font-size: 1.3rem; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .tally span { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--dim); }
+
+  .log { list-style: none; margin: 0.6rem 0 0; padding: 0; }
+
+  .log li {
+    display: grid;
+    grid-template-columns: 3.1rem 1fr;
+    gap: 0.1rem 0.6rem;
+    padding: 0.45rem 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .log time { font-family: var(--mono); font-size: 0.76rem; color: var(--dim); }
+  .log .kind { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em; color: var(--dim); }
+  .log .body { grid-column: 2; overflow-wrap: anywhere; }
+  .log .scene .body { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .log b { font-weight: 600; }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .res { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.08em; border: 1px solid currentcolor; padding: 0 0.25rem; }
+  .res.critical { color: var(--green); }
+  .res.fumble { color: var(--stamp); }
+  .res.success, .res.failure { color: var(--dim); }
+  .dim { color: var(--dim); font-size: 0.88em; }
+
+  /* ---------------------------------------------------------------- record + intake */
+
+  .rec { background: var(--card); border: 1px solid var(--rule); padding: 1.1rem; margin-top: 1rem; }
+  .rec h2 { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--stamp); margin: 1.3rem 0 0.35rem; }
+  .rec h2:first-child { margin-top: 0; }
+  .rec p { margin: 0 0 0.7rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .rec p.none { color: var(--dim); font-family: var(--mono); font-size: 0.8rem; }
+
+  .row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; align-items: center; }
+
+  button.go, label.go {
+    appearance: none;
+    background: var(--green);
+    border: 1px solid var(--green);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.6rem 1rem;
+    min-height: 2.6rem;
+    cursor: pointer;
+  }
+
+  button.quiet {
+    appearance: none;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.6rem 1rem;
+    min-height: 2.6rem;
+    cursor: pointer;
+  }
+
+  button:disabled { opacity: 0.45; cursor: default; }
+
+  .intake { background: var(--card); border: 1px solid var(--rule); padding: 1.1rem; margin-top: 1.2rem; }
+  .intake h1 { font-size: 1.2rem; margin: 0 0 0.4rem; font-weight: 600; }
+  .intake textarea {
+    width: 100%;
+    min-height: 8rem;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    padding: 0.6rem;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    resize: vertical;
+  }
+
+  .say { font-family: var(--mono); font-size: 0.76rem; color: var(--dim); margin: 0.5rem 0 0; min-height: 1.2rem; }
+  .say[data-bad="1"] { color: var(--stamp); }
+
+  .picker { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 1rem; }
+  .picker select {
+    flex: 1 1 12rem;
+    background: var(--card);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    padding: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    min-height: 2.6rem;
+  }
+
+  .flag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--stamp);
+    border: 1px solid var(--stamp);
+    padding: 0.05rem 0.35rem;
+    margin-left: 0.4rem;
+    vertical-align: 0.1em;
+  }
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <span class="mark">Debrief</span>
+    <span class="op" id="op">—</span>
+    <span class="when" id="when"></span>
+  </div>
+  <div class="meter"><i id="meter"></i></div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="tab-ask" aria-selected="true" aria-controls="view-ask">Questions</button>
+    <button role="tab" id="tab-log" aria-selected="false" aria-controls="view-log">Log</button>
+    <button role="tab" id="tab-rec" aria-selected="false" aria-controls="view-rec">Record</button>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section id="view-ask" role="tabpanel" aria-labelledby="tab-ask"></section>
+  <section id="view-log" role="tabpanel" aria-labelledby="tab-log" hidden></section>
+  <section id="view-rec" role="tabpanel" aria-labelledby="tab-rec" hidden></section>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ------------------------------------------------------------ the example */
+
+  const EXAMPLE = {
+    v: 1, example: true, operation: "OPERATION ALADDIN'S CAVE", world: "delta-green-1960s",
+    capturedAt: Date.parse("1967-09-14T23:40:00"), from: Date.parse("1967-09-14T19:02:00"),
+    to: Date.parse("1967-09-14T23:38:00"),
+    scenes: [{ t: "19:02", name: "Đà Nẵng — the airfield" }, { t: "21:11", name: "The compound" }],
+    cast: [{ name: "RORY", rolls: 14 }, { name: "KESSEL", rolls: 9 }],
+    events: [
+      { t: "19:02", kind: "scene", name: "Đà Nẵng — the airfield" },
+      { t: "19:20", kind: "roll", who: "RORY", label: "Alertness", target: 50, total: 12, result: "success", type: "skill" },
+      { t: "20:04", kind: "say", who: "Handler", text: "The revetments are empty and the wind is carrying rain in off the sea." },
+      { t: "21:11", kind: "scene", name: "The compound" },
+      { t: "21:26", kind: "roll", who: "KESSEL", label: "Firearms", target: 40, total: 98, result: "fumble", type: "skill" },
+      { t: "21:27", kind: "sanity-loss", who: "KESSEL", label: "Sanity Damage", total: 6 },
+      { t: "22:40", kind: "tool", source: "Suspicion", text: "Đà Nẵng +10 → 30" }
+    ],
+    dropped: 0,
+    tally: { rolls: 23, success: 11, failure: 9, critical: 1, fumble: 2, sanityLost: { KESSEL: 6 }, damage: 11, scenes: 2 }
+  };
+
+  /* ------------------------------------------------------------ the questions */
+
+  const SPINE_HEAD = [
+    ["arc", "Where did it start, and where did it end?"],
+    ["happened", "What happened?"]
+  ];
+
+  const SPINE_TAIL = [
+    ["believe", "What does the cell now believe?"],
+    ["left", "What did they leave behind?"],
+    ["owed", "What is owed for next time?"],
+    ["threads", "Which threads opened, moved or closed?"],
+    ["met", "Who did they meet?"],
+    ["ruled", "What did you rule at the table?"],
+    ["else", "Anything else, before it goes?"]
+  ];
+
+  const CAP = { fumble: 5, critical: 5, tool: 8, san: 8, scene: 6 };
+
+  const take = (list, n) => list.slice(0, n);
+
+  function questions(dg) {
+    const ev = dg.events || [];
+    const out = SPINE_HEAD.map(([id, ask]) => ({ id, ask, chip: id === "arc" ? arcChip(dg) : "" }));
+
+    const scenes = ev.filter(e => e.kind === "scene").slice(1);
+    for (const [i, e] of take(scenes, CAP.scene).entries())
+      out.push({ id: `scene-${i}`, ask: `They moved to ${e.name} at ${e.t} — why?`, chip: `${e.t} · SCENE · ${e.name}` });
+
+    for (const [i, e] of take(ev.filter(e => e.kind === "sanity-loss"), CAP.san).entries())
+      out.push({ id: `san-${i}`, ask: `${e.who || "Someone"} lost ${e.total} SAN at ${e.t} — what did they see?`, chip: `${e.t} · SAN · ${e.who} −${e.total}` });
+
+    for (const [i, e] of take(ev.filter(e => e.result === "fumble"), CAP.fumble).entries())
+      out.push({ id: `fumble-${i}`, ask: `${e.who || "Someone"} fumbled ${e.label} at ${e.t} — what went wrong?`, chip: `${e.t} · ROLL · ${e.who} · ${e.label} · rolled ${e.total} against ${e.target}` });
+
+    for (const [i, e] of take(ev.filter(e => e.result === "critical"), CAP.critical).entries())
+      out.push({ id: `crit-${i}`, ask: `${e.who || "Someone"} rolled a critical ${e.label} at ${e.t} — what did it buy them?`, chip: `${e.t} · ROLL · ${e.who} · ${e.label} · rolled ${e.total} against ${e.target}` });
+
+    for (const [i, e] of take(ev.filter(e => e.kind === "tool"), CAP.tool).entries())
+      out.push({ id: `tool-${i}`, ask: `${e.source} moved at ${e.t} — what caused it?`, chip: `${e.t} · ${e.source.toUpperCase()} · ${e.text}` });
+
+    for (const [id, ask] of SPINE_TAIL) out.push({ id, ask, chip: "" });
+    return out;
+  }
+
+  function arcChip(dg) {
+    const s = dg.scenes || [];
+    if (!s.length) return "";
+    const first = s[0], last = s[s.length - 1];
+    return s.length === 1 ? `${first.t} · ${first.name}` : `${first.t} · ${first.name}  →  ${last.t} · ${last.name}`;
+  }
+
+  const SECTIONS = [
+    ["What happened", ["arc", "happened"]],
+    ["The moments", null],
+    ["What the cell now believes", ["believe"]],
+    ["What they left behind", ["left"]],
+    ["Owed for next time", ["owed"]],
+    ["Threads", ["threads"]],
+    ["People", ["met"]],
+    ["Rulings made at the table", ["ruled"]],
+    ["Loose", ["else"]]
+  ];
+
+  /* ------------------------------------------------------------ state */
+
+  const state = {
+    db: null,
+    sid: null,
+    sessions: [],
+    digest: EXAMPLE,
+    isExample: true,
+    answers: {},
+    qs: [],
+    saving: false,
+    dirty: false
+  };
+
+  const $ = id => document.getElementById(id);
+  const el = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  };
+
+  const stamp = ms => {
+    if (!ms) return "";
+    const d = new Date(ms);
+    return d.toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" }).toUpperCase();
+  };
+
+  const answered = id => {
+    const a = state.answers[id];
+    return !!a && (a.skip || (a.text || "").trim().length > 0);
+  };
+
+  /* ------------------------------------------------------------ db */
+
+  const path = () => `sessions/${state.sid}/parts/answers`;
+
+  let queue = Promise.resolve();
+
+  function save() {
+    if (!state.db || !state.sid || state.isExample) return;
+    state.dirty = true;
+    paintState("held");
+    queue = queue.then(async () => {
+      if (!state.dirty) return;
+      state.dirty = false;
+      try {
+        await state.db.doc(path()).set({ answers: state.answers, touched: Date.now() });
+        paintState("saved");
+      } catch (err) {
+        paintState(err && err.code === "invalid_argument" ? "read only" : "not saved");
+      }
+    });
+  }
+
+  let holdTimer = 0;
+  const saveSoon = () => {
+    clearTimeout(holdTimer);
+    state.dirty = true;
+    paintState("held");
+    holdTimer = setTimeout(save, 900);
+  };
+
+  function paintState(word) {
+    for (const n of document.querySelectorAll(".state")) {
+      n.textContent = word;
+      n.dataset.on = word === "saved" ? "saved" : word === "held" ? "held" : "";
+    }
+  }
+
+  /* ------------------------------------------------------------ paint: questions */
+
+  function paintAsk() {
+    const box = $("view-ask");
+    box.replaceChildren();
+
+    box.append(intake());
+
+    state.qs = questions(state.digest);
+    state.qs.forEach((q, i) => box.append(card(q, i + 1)));
+    paintMeter();
+  }
+
+  function card(q, n) {
+    const wrap = el("article", "q");
+    wrap.dataset.skip = state.answers[q.id]?.skip ? "1" : "0";
+
+    wrap.append(el("div", "q-no", `${String(n).padStart(2, "0")} / ${String(state.qs.length).padStart(2, "0")}`));
+    wrap.append(el("h2", "q-ask", q.ask));
+    if (q.chip) wrap.append(el("span", "chip", q.chip));
+
+    const ta = el("textarea");
+    ta.id = `a-${q.id}`;
+    ta.value = state.answers[q.id]?.text || "";
+    ta.rows = 3;
+    ta.setAttribute("autocapitalize", "sentences");
+    ta.setAttribute("enterkeyhint", "enter");
+    ta.setAttribute("aria-label", q.ask);
+    ta.addEventListener("input", () => {
+      state.answers[q.id] = { text: ta.value, skip: false };
+      wrap.dataset.skip = "0";
+      paintMeter();
+      saveSoon();
+    });
+    wrap.append(ta);
+
+    const foot = el("div", "q-foot");
+    foot.append(el("span", "state"));
+    const skip = el("button", "skip", "Nothing");
+    skip.type = "button";
+    skip.addEventListener("click", () => {
+      const on = !state.answers[q.id]?.skip;
+      state.answers[q.id] = { text: ta.value, skip: on };
+      wrap.dataset.skip = on ? "1" : "0";
+      paintMeter();
+      save();
+    });
+    foot.append(skip);
+    wrap.append(foot);
+    return wrap;
+  }
+
+  function paintMeter() {
+    const total = state.qs.length || 1;
+    const done = state.qs.filter(q => answered(q.id)).length;
+    $("meter").style.width = `${Math.round((done / total) * 100)}%`;
+    $("when").textContent = `${done}/${state.qs.length} · ${stamp(state.digest.capturedAt)}`;
+  }
+
+  /* ------------------------------------------------------------ paint: log */
+
+  function paintLog() {
+    const box = $("view-log");
+    box.replaceChildren();
+
+    const t = state.digest.tally || {};
+    const tally = el("div", "tally");
+    for (const [k, v] of [["Rolls", t.rolls], ["Success", t.success], ["Failure", t.failure],
+                          ["Critical", t.critical], ["Fumble", t.fumble], ["Scenes", t.scenes]]) {
+      const d = el("div");
+      d.append(el("b", null, String(v ?? 0)), el("span", null, k));
+      tally.append(d);
+    }
+    box.append(tally);
+
+    const list = el("ol", "log");
+    for (const e of state.digest.events || []) {
+      const li = el("li", e.kind === "scene" ? "scene" : null);
+      li.append(el("time", null, e.t), el("span", "kind", kindWord(e)));
+      li.append(body(e));
+      list.append(li);
+    }
+    if (!(state.digest.events || []).length) list.append(el("li", null, "Nothing in this digest."));
+    box.append(list);
+  }
+
+  const KINDS = { scene: "SCENE", roll: "ROLL", "sanity-loss": "SAN", damage: "DAMAGE", lethality: "LETHAL", tool: "TOOL", say: "SAID" };
+  const kindWord = e => KINDS[e.kind] || String(e.kind || "").toUpperCase();
+
+  function body(e) {
+    const b = el("span", "body");
+    if (e.who) b.append(el("b", null, e.who), document.createTextNode(" "));
+    if (e.name) b.append(document.createTextNode(`${e.name} `));
+    if (e.label) b.append(document.createTextNode(`${e.label} `));
+    if (e.target != null) b.append(el("span", "dim", `target ${e.target} `));
+    if (e.total != null) b.append(el("span", "num", String(e.total)), document.createTextNode(" "));
+    if (e.result) b.append(el("span", `res ${e.result}`, e.result.toUpperCase()), document.createTextNode(" "));
+    if (e.source) b.append(el("span", "dim", `${e.source} `));
+    if (e.text) b.append(document.createTextNode(e.text));
+    return b;
+  }
+
+  /* ------------------------------------------------------------ paint: record */
+
+  function paintRec() {
+    const box = $("view-rec");
+    box.replaceChildren();
+
+    const rec = el("div", "rec");
+    for (const [heading, ids] of SECTIONS) {
+      const picked = ids ? state.qs.filter(q => ids.includes(q.id))
+                         : state.qs.filter(q => !SPINE_HEAD.concat(SPINE_TAIL).some(([sid]) => sid === q.id));
+      const written = picked.filter(q => (state.answers[q.id]?.text || "").trim());
+      if (!picked.length) continue;
+      rec.append(el("h2", null, heading));
+      if (!written.length) { rec.append(el("p", "none", "—")); continue; }
+      for (const q of written) {
+        const p = el("p");
+        if (ids === null) p.append(el("b", null, `${q.ask} `));
+        p.append(document.createTextNode(state.answers[q.id].text.trim()));
+        rec.append(p);
+      }
+    }
+    box.append(rec);
+
+    const row = el("div", "row");
+    const copy = el("button", "go", "Copy the record");
+    copy.type = "button";
+    copy.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(plain());
+        copy.textContent = "Copied";
+        setTimeout(() => (copy.textContent = "Copy the record"), 1600);
+      } catch {
+        const ta = el("textarea");
+        ta.value = plain();
+        ta.style.cssText = "width:100%;min-height:14rem;margin-top:1rem";
+        row.after(ta);
+        ta.select();
+      }
+    });
+    row.append(copy);
+    box.append(row);
+  }
+
+  function plain() {
+    const d = state.digest;
+    const lines = [`${d.operation || "SESSION"} — ${stamp(d.capturedAt)}`, ""];
+    for (const [heading, ids] of SECTIONS) {
+      const picked = ids ? state.qs.filter(q => ids.includes(q.id))
+                         : state.qs.filter(q => !SPINE_HEAD.concat(SPINE_TAIL).some(([sid]) => sid === q.id));
+      const written = picked.filter(q => (state.answers[q.id]?.text || "").trim());
+      if (!written.length) continue;
+      lines.push(heading.toUpperCase(), "");
+      for (const q of written) {
+        if (ids === null) lines.push(`${q.ask}`);
+        lines.push(state.answers[q.id].text.trim(), "");
+      }
+    }
+    return lines.join("\n");
+  }
+
+  /* ------------------------------------------------------------ intake */
+
+  function intake() {
+    const box = el("div", "intake");
+    const h = el("h1", null, state.isExample ? "No session loaded" : (state.digest.operation || "Session"));
+    if (state.isExample) h.append(el("span", "flag", "Example below"));
+    box.append(h);
+
+    const pasteBox = el("div");
+    pasteBox.hidden = !state.isExample;
+
+    const ta = el("textarea");
+    ta.id = "paste";
+    ta.setAttribute("aria-label", "Session digest");
+    ta.setAttribute("spellcheck", "false");
+    pasteBox.append(ta);
+
+    const say = el("p", "say");
+    pasteBox.append(say);
+
+    const goRow = el("div", "row");
+    const go = el("button", "go", "Load digest");
+    go.type = "button";
+    go.addEventListener("click", () => load(ta.value, say));
+    goRow.append(go);
+    pasteBox.append(goRow);
+    box.append(pasteBox);
+
+    const pick = el("div", "picker");
+    if (state.sessions.length) {
+      const sel = el("select");
+      sel.setAttribute("aria-label", "Session");
+      for (const s of state.sessions) {
+        const o = el("option", null, `${s.operation || "Session"} — ${stamp(s.capturedAt)}`);
+        o.value = s.id;
+        if (s.id === state.sid) o.selected = true;
+        sel.append(o);
+      }
+      sel.addEventListener("change", () => open(sel.value));
+      pick.append(sel);
+    }
+    const another = el("button", "quiet", "Paste a digest");
+    another.type = "button";
+    another.hidden = state.isExample;
+    another.addEventListener("click", () => {
+      pasteBox.hidden = false;
+      another.hidden = true;
+      ta.focus();
+    });
+    pick.append(another);
+    if (pick.children.length) box.append(pick);
+
+    return box;
+  }
+
+  async function load(text, say) {
+    say.dataset.bad = "0";
+    say.textContent = "";
+    let dg;
+    try {
+      dg = JSON.parse(text);
+    } catch {
+      say.dataset.bad = "1";
+      say.textContent = "That is not the digest — paste what Debrief copied in Foundry.";
+      return;
+    }
+    if (!dg || typeof dg !== "object" || !Array.isArray(dg.events)) {
+      say.dataset.bad = "1";
+      say.textContent = "That JSON has no events in it.";
+      return;
+    }
+    if (!state.db) {
+      say.dataset.bad = "1";
+      say.textContent = "No store here — open this page signed in.";
+      return;
+    }
+    const id = `s${dg.capturedAt || Date.now()}`;
+    try {
+      await state.db.doc(`sessions/${id}`).set({
+        operation: dg.operation || "",
+        capturedAt: dg.capturedAt || Date.now(),
+        digest: dg
+      });
+    } catch (err) {
+      say.dataset.bad = "1";
+      say.textContent = err && err.code === "invalid_argument"
+        ? "The store refused it — the digest may be too large, or this view cannot write."
+        : "The store did not take it. Try again.";
+      return;
+    }
+    await listSessions();
+    await open(id);
+  }
+
+  /* ------------------------------------------------------------ sessions */
+
+  async function listSessions() {
+    if (!state.db) return;
+    try {
+      const snap = await state.db.collection("sessions").orderBy("capturedAt", "desc").limit(50).get();
+      state.sessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch {
+      state.sessions = [];
+    }
+  }
+
+  async function open(id) {
+    if (!state.db || !id) return;
+    const snap = await state.db.doc(`sessions/${id}`).get();
+    if (!snap.exists) return;
+    const row = snap.data();
+    state.sid = id;
+    state.digest = row.digest || { events: [], tally: {} };
+    state.isExample = false;
+    state.answers = {};
+
+    try {
+      const a = await state.db.doc(`sessions/${id}/parts/answers`).get();
+      if (a.exists) state.answers = a.data().answers || {};
+    } catch { /* an unreadable answers doc is an empty one */ }
+
+    $("op").textContent = state.digest.operation || row.operation || "Session";
+    paintAll();
+  }
+
+  /* ------------------------------------------------------------ frame */
+
+  function paintAll() {
+    paintAsk();
+    paintLog();
+    paintRec();
+  }
+
+  const TABS = [["tab-ask", "view-ask"], ["tab-log", "view-log"], ["tab-rec", "view-rec"]];
+
+  for (const [t, v] of TABS) {
+    $(t).addEventListener("click", () => {
+      for (const [t2, v2] of TABS) {
+        $(t2).setAttribute("aria-selected", String(t2 === t));
+        $(v2).hidden = v2 !== v;
+      }
+      if (v === "view-rec") paintRec();
+      window.scrollTo({ top: 0 });
+    });
+  }
+
+  $("op").textContent = EXAMPLE.operation;
+  paintAll();
+
+  window.addEventListener("beforeunload", () => { if (state.dirty) save(); });
+
+  (async () => {
+    const db = window.claude && typeof window.claude.use === "function" ? await window.claude.use("db") : null;
+    if (!db) return;
+    state.db = db;
+    await listSessions();
+    if (state.sessions.length) await open(state.sessions[0].id);
+    else paintAsk();
+  })();
+})();
+</script>

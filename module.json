@@ -1,0 +1,41 @@
+{
+  "id": "dg-debrief",
+  "title": "DG Tools · Debrief",
+  "description": "The after-action record for a session. Reads the world's chat log, classifies what it finds — every roll against its target and result, sanity lost, damage taken, scene moves, and whatever the other dg-* tools announced — and hands the whole run over as one digest for the Handler's Debrief page to ask questions from. Reads only; writes nothing to any document. Personal use, not for redistribution.",
+  "version": "0.1.0",
+  "authors": [
+    {
+      "name": "Fabio Venturini"
+    }
+  ],
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "deltagreen",
+        "type": "system",
+        "compatibility": {
+          "minimum": "1.0.0"
+        }
+      }
+    ],
+    "recommends": [
+      {
+        "id": "dg-hud",
+        "type": "module"
+      }
+    ]
+  },
+  "esmodules": [
+    "scripts/dg-debrief.mjs"
+  ],
+  "styles": [
+    "css/dg-debrief.css"
+  ],
+  "socket": false,
+  "packs": [],
+  "url": "https://github.com/fabioventurini/dg-debrief"
+}

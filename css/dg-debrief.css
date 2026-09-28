@@ -1,0 +1,119 @@
+/* Debrief. A duty log: fixed columns, a lot of air, colour only where it carries a word. */
+
+.dg-debrief .window-content { padding: 0; }
+
+.dgdb {
+  --dgdb-ink: #1b211f;
+  --dgdb-dim: #5c6360;
+  --dgdb-paper: #e6e8e4;
+  --dgdb-rule: #c7ccc6;
+  --dgdb-stamp: #a32b21;
+  --dgdb-green: #0b6b3a;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--dgdb-paper);
+  color: var(--dgdb-ink);
+  font-family: "IBM Plex Sans", "Helvetica Neue", sans-serif;
+}
+
+.dgdb-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--dgdb-rule);
+}
+
+.dgdb-field { display: flex; flex-direction: column; gap: 0.25rem; flex: 1 1 14rem; }
+.dgdb-field > span {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dgdb-dim);
+}
+.dgdb-field input,
+.dgdb-field select {
+  background: #fff;
+  border: 1px solid var(--dgdb-rule);
+  color: var(--dgdb-ink);
+  padding: 0.35rem 0.5rem;
+  font-family: inherit;
+}
+
+.dgdb-tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--dgdb-rule);
+}
+.dgdb-stat { display: flex; flex-direction: column; line-height: 1.1; }
+.dgdb-stat b { font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.dgdb-stat span {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dgdb-dim);
+}
+
+.dgdb-log {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.5rem 0;
+  list-style: none;
+}
+.dgdb-e {
+  display: grid;
+  grid-template-columns: 3.4rem 4.6rem 1fr;
+  gap: 0.6rem;
+  align-items: baseline;
+  padding: 0.3rem 1rem;
+}
+.dgdb-e + .dgdb-e { border-top: 1px solid rgb(0 0 0 / 5%); }
+.dgdb-e-scene { background: rgb(0 0 0 / 4%); }
+.dgdb-t,
+.dgdb-k,
+.dgdb-num,
+.dgdb-res {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.dgdb-t { color: var(--dgdb-dim); font-size: 0.8rem; }
+.dgdb-k {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--dgdb-dim);
+}
+.dgdb-b { line-height: 1.45; overflow-wrap: anywhere; }
+.dgdb-dim { color: var(--dgdb-dim); font-size: 0.85em; }
+.dgdb-num { font-weight: 600; }
+.dgdb-res { font-size: 0.7rem; letter-spacing: 0.08em; padding: 0 0.3rem; border: 1px solid currentcolor; }
+.dgdb-critical { color: var(--dgdb-green); }
+.dgdb-fumble { color: var(--dgdb-stamp); }
+.dgdb-success,
+.dgdb-failure { color: var(--dgdb-dim); }
+.dgdb-empty { padding: 2rem 1rem; color: var(--dgdb-dim); }
+
+.dgdb-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  border-top: 1px solid var(--dgdb-rule);
+}
+.dgdb-grow { flex: 1 1 auto; }
+.dgdb-foot button {
+  background: #fff;
+  border: 1px solid var(--dgdb-rule);
+  color: var(--dgdb-ink);
+  padding: 0.4rem 0.9rem;
+  font-family: inherit;
+  width: auto;
+}
+.dgdb-foot button.dgdb-go {
+  background: var(--dgdb-green);
+  border-color: var(--dgdb-green);
+  color: #fff;
+}
