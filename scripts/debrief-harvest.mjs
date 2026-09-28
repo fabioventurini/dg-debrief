@@ -74,7 +74,7 @@ function rollEvent(v, words) {
   const e = { t: hhmm(v.t), at: v.t, kind, who: v.alias, label: label || clean(v.flavor, 80), total: roll.total };
   if (kind === "roll") {
     e.target = target;
-    e.result = readResult(v.text, words);
+    e.result = readResult(v.verdict || v.text, words);
     e.type = roll.type ?? null;
   }
   if (v.hidden) e.hidden = true;

@@ -26,8 +26,10 @@ const scratch = () => document.createElement("div");
 export function toView(msg) {
   const box = scratch();
   box.innerHTML = msg.content ?? "";
-  const labelEl = box.querySelector(".dg-chat-card__roll-label");
-  const rollLabel = labelEl?.textContent ?? "";
+  const rollLabel = box.querySelector(".dg-chat-card__roll-label")?.textContent ?? "";
+  /* The system prints the verdict into the dice-formula slot, where a plain Foundry roll puts
+     "1d100" — so it is read from there before the dice furniture is stripped out. */
+  const verdict = box.querySelector(".dice-formula")?.textContent ?? "";
   for (const el of box.querySelectorAll(".dice-formula, .dice-tooltip, .dice-result .dice-rolls, button")) el.remove();
 
   const sceneName = msg.speaker?.scene ? game.scenes.get(msg.speaker.scene)?.name ?? "" : "";
@@ -45,6 +47,7 @@ export function toView(msg) {
     hidden: !!(msg.whisper?.length || msg.blind),
     text: box.textContent ?? "",
     rollLabel,
+    verdict,
     flavor: msg.flavor ?? "",
     modules,
     rolls: (msg.rolls ?? []).map(r => ({

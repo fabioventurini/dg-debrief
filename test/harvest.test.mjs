@@ -9,11 +9,12 @@ const at = min => T0 + min * 60_000;
 
 const view = (over = {}) => ({
   id: "m1", t: T0, author: "Fabio", alias: "ANDERSON", sceneName: "", style: "ic",
-  hidden: false, text: "", rollLabel: "", flavor: "", modules: [], rolls: [], ...over,
+  hidden: false, text: "", rollLabel: "", verdict: "", flavor: "", modules: [], rolls: [], ...over,
 });
 
 const roll = (over = {}) => view({
-  rollLabel: "Firearms: 50%", text: "1D100 41 Success", rolls: [{ total: 41, type: "skill", key: "firearms" }], ...over,
+  rollLabel: "Firearms: 50%", verdict: "Success", text: "1d100 41 41",
+  rolls: [{ total: 41, type: "skill", key: "firearms" }], ...over,
 });
 
 test("the four results are read off the card, criticals before their plain halves", () => {
@@ -54,7 +55,7 @@ test("a scene event is emitted when the speaker's scene changes, once per change
 
 test("rolls carry who, skill, target, total and verdict; sanity damage becomes a loss", () => {
   const d = harvest([
-    roll({ t: at(14), alias: "ANDERSON", text: "1D100 98 CRITICAL FAILURE!", rolls: [{ total: 98, type: "skill", key: "firearms" }] }),
+    roll({ t: at(14), alias: "ANDERSON", verdict: "CRITICAL FAILURE!", rolls: [{ total: 98, type: "skill", key: "firearms" }] }),
     view({ t: at(15), alias: "ANDERSON", rollLabel: "Sanity Damage", text: "1D6 6", rolls: [{ total: 6, type: "sanity-damage" }] }),
     view({ t: at(16), alias: "GALLOWAY", rollLabel: "Damage", text: "1D10 9", rolls: [{ total: 9, type: "damage" }] }),
   ], { words: WORDS });
@@ -113,4 +114,13 @@ test("an empty log produces an empty digest rather than throwing", () => {
   assert.deepEqual(d.events, []);
   assert.equal(d.from, null);
   assert.equal(d.tally.rolls, 0);
+});
+
+test("the verdict is read from the dice-formula slot the system prints it into, not the body", () => {
+  const d = harvest([
+    view({ rollLabel: "Firearms: 50%", verdict: "Success", text: "1d100 19 19 19", rolls: [{ total: 19, type: "skill" }] }),
+    view({ rollLabel: "SAN: 50%", verdict: "", text: "Success 1d100 19", rolls: [{ total: 19, type: "sanity" }] }),
+  ], { words: WORDS });
+  assert.equal(d.events[0].result, "success", "the slot wins when it has the word");
+  assert.equal(d.events[1].result, "success", "the body is the fallback when the slot is empty");
 });
