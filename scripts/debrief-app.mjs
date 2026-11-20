@@ -1,6 +1,6 @@
 /* The one window: what the chat log holds, and the two ways to take it out of Foundry. */
 
-import { digest, settings, windows } from "./dg-debrief.mjs";
+import { digest, readCheckpoint, settings, windows } from "./dg-debrief.mjs";
 
 const esc = s => foundry.utils.escapeHTML(String(s ?? ""));
 
@@ -60,10 +60,11 @@ export class DebriefApp extends foundry.applications.api.ApplicationV2 {
   static refresh() { if (DebriefApp.#instance?.rendered) DebriefApp.#instance.render(); }
 
   #which = "run";
+  #checkpoint = null;
 
   async _renderHTML() {
     const w = windows();
-    const d = digest(this.#which);
+    const d = this.#checkpoint ?? digest(this.#which);
     const el = document.createElement("div");
     el.className = "dgdb";
     el.innerHTML = `
@@ -104,6 +105,7 @@ export class DebriefApp extends foundry.applications.api.ApplicationV2 {
       <footer class="dgdb-foot">
         <button type="button" data-do="mark">Mark session start</button>
         <span class="dgdb-grow"></span>
+        <button type="button" data-do="loadcp">${this.#checkpoint ? "Back to live" : "Load checkpoint"}</button>
         <button type="button" data-do="file">Save digest file</button>
         <button type="button" data-do="copy" class="dgdb-go">Copy digest</button>
       </footer>`;
@@ -124,6 +126,17 @@ export class DebriefApp extends foundry.applications.api.ApplicationV2 {
     for (const btn of content.querySelectorAll("[data-do]")) {
       const what = btn.dataset.do;
       btn.addEventListener("click", async () => {
+        if (what === "loadcp") {
+          if (this.#checkpoint) {
+            this.#checkpoint = null;
+          } else {
+            const cp = readCheckpoint();
+            if (!cp) ui.notifications.warn("Debrief: no checkpoint saved yet.");
+            this.#checkpoint = cp ?? null;
+          }
+          this.render();
+          return;
+        }
         if (what === "mark") {
           settings.mark = Date.now();
           ui.notifications.info("Debrief: session start marked.");

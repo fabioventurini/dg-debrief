@@ -124,3 +124,21 @@ test("the verdict is read from the dice-formula slot the system prints it into, 
   assert.equal(d.events[0].result, "success", "the slot wins when it has the word");
   assert.equal(d.events[1].result, "success", "the body is the fallback when the slot is empty");
 });
+
+test("the event cap keeps the end of the session, not the start", () => {
+  /* 12 chat lines, cap of 5: the last five must survive, and the digest must say it was cut. */
+  const views = Array.from({ length: 12 }, (_, i) => view({ id: `m${i}`, t: at(i), text: `line ${i}` }));
+  const d = harvest(views, { words: WORDS, limits: { events: 5, say: 500, chars: 400 } });
+  assert.equal(d.events.length, 5);
+  assert.equal(d.truncated, true);
+  assert.equal(d.dropped, 7);
+  assert.deepEqual(d.events.map(e => e.text), ["line 7", "line 8", "line 9", "line 10", "line 11"]);
+});
+
+test("a session under the cap is untouched and says so", () => {
+  const views = Array.from({ length: 6 }, (_, i) => view({ id: `n${i}`, t: at(i), text: `line ${i}` }));
+  const d = harvest(views, { words: WORDS, limits: { events: 50, say: 50, chars: 400 } });
+  assert.equal(d.events.length, 6);
+  assert.equal(d.truncated, false);
+  assert.equal(d.dropped, 0);
+});

@@ -9,10 +9,14 @@ export const DIGEST_VERSION = 1;
 /* A session is a contiguous run of chat. Five hours of silence ends one. */
 export const SESSION_GAP_MS = 5 * 60 * 60 * 1000;
 
+/* Generous on purpose. A four-hour session runs well past a few hundred events, and the old caps
+   truncated silently — worse, they truncated the *end*, which is the part a debrief most needs.
+   The numbers here are high enough that a normal session is never cut, and if one ever is,
+   `truncated` says so and the tail is what survives. */
 export const LIMITS = {
-  events: 400,
-  say: 80,
-  chars: 400,
+  events: 5000,
+  say: 2000,
+  chars: 2000,
 };
 
 const clean = (s, n = LIMITS.chars) => {
@@ -91,10 +95,7 @@ export function harvest(views, { words, limits = LIMITS } = {}) {
   let says = 0;
   let dropped = 0;
 
-  const push = e => {
-    if (events.length < limits.events) events.push(e);
-    else dropped += 1;
-  };
+  const push = e => { events.push(e); };
 
   for (const v of sorted) {
     if (v.sceneName && v.sceneName !== scene) {
@@ -123,6 +124,17 @@ export function harvest(views, { words, limits = LIMITS } = {}) {
     push({ t: hhmm(v.t), at: v.t, kind: "say", who: v.alias || v.author, text, voice: v.style });
   }
 
+  /* Over cap: keep the tail. The start of a session can be reconstructed from the transcript;
+     the end cannot, and losing it is what the old 400-event cap did. */
+  let truncated = false;
+  let overflow = 0;
+  if (events.length > limits.events) {
+    overflow = events.length - limits.events;
+    events.splice(0, overflow);
+    truncated = true;
+    dropped += overflow;
+  }
+
   return {
     v: DIGEST_VERSION,
     from: sorted.length ? sorted[0].t : null,
@@ -131,6 +143,7 @@ export function harvest(views, { words, limits = LIMITS } = {}) {
     cast: [...cast].sort((a, b) => b[1] - a[1]).map(([name, rolls]) => ({ name, rolls })),
     events,
     dropped,
+    truncated,
     tally: tally(events),
   };
 }

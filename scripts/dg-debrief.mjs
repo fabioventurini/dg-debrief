@@ -79,6 +79,25 @@ export function windows(all = views(), now = Date.now(), mark = settings.mark) {
   };
 }
 
+/* A checkpoint is a copy of the last run's digest kept in a world setting, so a session survives
+   Foundry being closed, or a browser tab dying, before anyone clicks Save. It is written at most
+   every ten minutes, and only when new chat has arrived since the last one. */
+export function saveCheckpoint() {
+  if (!game.user?.isGM) return null;
+  const d = digest("run");
+  if (!d.events.length) return null;
+  const prev = readCheckpoint();
+  if (prev && prev.to === d.to) return prev;
+  game.settings.set(MODULE_ID, "checkpoint", JSON.stringify(d));
+  return d;
+}
+
+export function readCheckpoint() {
+  const raw = game.settings.get(MODULE_ID, "checkpoint");
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
 export function digest(which = "run") {
   const w = windows()[which] ?? windows().run;
   return {
@@ -97,12 +116,17 @@ Hooks.once("init", () => {
   game.settings.register(MODULE_ID, "mark", {
     name: "Session start", scope: "world", config: false, type: Number, default: 0,
   });
+  game.settings.register(MODULE_ID, "checkpoint", {
+    name: "Last checkpoint", scope: "world", config: false, type: String, default: "",
+  });
 
   /* Set at init, not ready: the HUD builds its tabs at ready and must find this already there. */
   game.modules.get(MODULE_ID).api = {
     open: () => (game.user.isGM ? DebriefApp.show() : null),
     digest: which => (game.user.isGM ? digest(which) : null),
     markStart: () => { if (game.user.isGM) settings.mark = Date.now(); },
+    checkpoint: () => saveCheckpoint(),
+    readCheckpoint: () => readCheckpoint(),
   };
 });
 
@@ -122,4 +146,13 @@ Hooks.on("getSceneControlButtons", controls => {
   };
   if (Array.isArray(group.tools)) group.tools.push(tool);
   else group.tools[tool.name] = tool;
+});
+
+/* Ten minutes is a compromise: often enough that a crash costs little, rare enough that a world
+   setting is not rewritten constantly, and only when the chat has actually moved. */
+Hooks.once("ready", () => {
+  if (!game.user?.isGM) return;
+  globalThis.setInterval(() => {
+    try { saveCheckpoint(); } catch (err) { console.warn("dg-debrief: checkpoint failed", err); }
+  }, 10 * 60 * 1000);
 });
