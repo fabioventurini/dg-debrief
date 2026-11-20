@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 — 2026-11-20
+
+A checkpoint is written into a world setting, which is not free. Above 1.5 MB the stored copy
+drops the oldest events and marks itself `truncated`, so a long session cannot bloat the world
+database or stutter the table.
+
 ## 0.2.0 — 2026-11-20
 
 **The caps no longer cut the end of a session.**

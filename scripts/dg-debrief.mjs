@@ -88,7 +88,22 @@ export function saveCheckpoint() {
   if (!d.events.length) return null;
   const prev = readCheckpoint();
   if (prev && prev.to === d.to) return prev;
-  game.settings.set(MODULE_ID, "checkpoint", JSON.stringify(d));
+
+  /* A world setting is not free: it is rewritten into the world database, so a multi-megabyte
+     digest every ten minutes would be a stutter at the table. Keep the tail, drop the start. */
+  const CEILING = 1_500_000;
+  let text = JSON.stringify(d);
+  if (text.length > CEILING) {
+    const trimmed = { ...d, events: [...d.events] };
+    while (trimmed.events.length > 1 && text.length > CEILING) {
+      trimmed.events.splice(0, Math.max(1, Math.ceil(trimmed.events.length / 10)));
+      trimmed.truncated = true;
+      text = JSON.stringify(trimmed);
+    }
+    game.settings.set(MODULE_ID, "checkpoint", text);
+    return trimmed;
+  }
+  game.settings.set(MODULE_ID, "checkpoint", text);
   return d;
 }
 
