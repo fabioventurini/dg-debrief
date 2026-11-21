@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2 — 2026-11-21
+
+**The manifest can now be installed from.** `module.json` carried no `download` URL, so Foundry's
+*Install from Manifest URL* refused it with *"does not provide a download URL that can be installed"*.
+The file now names its own manifest and the release zip. No runtime change: the scripts and the
+harvest are identical to 0.2.1.
+
 ## 0.2.1 — 2026-11-20
 
 A checkpoint is written into a world setting, which is not free. Above 1.5 MB the stored copy

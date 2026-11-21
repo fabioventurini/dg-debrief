@@ -1,8 +1,8 @@
 {
   "id": "dg-debrief",
-  "title": "DG Tools \u00b7 Debrief",
-  "description": "The after-action record for a session. Reads the world's chat log, classifies what it finds \u2014 every roll against its target and result, sanity lost, damage taken, scene moves, and whatever the other dg-* tools announced \u2014 and hands the whole run over as one digest for the Handler's Debrief page to ask questions from. Reads only; writes nothing to any document. Personal use, not for redistribution.",
-  "version": "0.2.1",
+  "title": "DG Tools · Debrief",
+  "description": "The after-action record for a session. Reads the world's chat log, classifies what it finds — every roll against its target and result, sanity lost, damage taken, scene moves, and whatever the other dg-* tools announced — and hands the whole run over as one digest for the Handler's Debrief page to ask questions from. Reads only; writes nothing to any document. Personal use, not for redistribution.",
+  "version": "0.2.2",
   "authors": [
     {
       "name": "Fabio Venturini"
@@ -37,5 +37,7 @@
   ],
   "socket": false,
   "packs": [],
-  "url": "https://github.com/fabioventurini/dg-debrief"
+  "url": "https://github.com/fabioventurini/dg-debrief",
+  "manifest": "https://github.com/fabioventurini/dg-debrief/releases/latest/download/module.json",
+  "download": "https://github.com/fabioventurini/dg-debrief/releases/download/v0.2.2/dg-debrief-v0.2.2.zip"
 }
